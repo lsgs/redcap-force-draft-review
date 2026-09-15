@@ -1,0 +1,29 @@
+{
+    "name": "Force Draft Review",
+    "namespace": "MCRI\\ForceDraftReview",
+    "authors": [
+        {
+            "name": "Luke Stevens",
+            "email": "luke.stevens@mcri.edu.au",
+            "institution": "Murdoch Children's Research Institute"
+        }
+    ],
+    "description": "Changes the \"Submit Draft Changes\" button in the Online Designer and Data Dictionary pages to redirect to the \"View summary of drafted changes\" page. Changes may then be submitted from there.",
+    "framework-version": 16,
+    "system-settings": [
+         {
+            "key": "submit-btn-text-s",
+            "name": "(Optional) Override text for \"Submit Changes for Review\" button label on Online Designer and Data Dictionary pages<pre>design_255 = \"Submit Changes for Review\"</pre>",
+            "type": "text",
+            "required": false
+        }
+    ],
+    "project-settings": [
+         {
+            "key": "submit-btn-text-p",
+            "name": "(Optional) Override text for \"Submit Changes for Review\" button label on Online Designer and Data Dictionary pages",
+            "type": "text",
+            "required": false
+        }
+    ]
+}
