@@ -74,13 +74,17 @@ class ForceDraftReview extends AbstractExternalModule
         global $auto_prod_changes, $status;
         if (intval($status) != 1) return;
 
+        $prod_dd = \REDCap::getDataDictionary($project_id, 'json', false, null, null, false);
+        $draft_dd = \REDCap::getDataDictionary($project_id, 'json', false, null, null, true);
+        if ($prod_dd===$draft_dd) return; // no changes to submit
+
         $auto_prod_txt = ($auto_prod_changes > 0) ? "<div style='background:#f5f5f5;border:1px solid #ddd;padding:4px;'>".\RCView::tt('design_287',false)."</div>" : "<br>";
         $multi_lang_txt = (\MultiLanguageManagement\MultiLanguage::isActive($project_id) && \MultiLanguageManagement\MultiLanguage::hasLanguages($project_id)) ? \RCView::div(['class'=>'yellow mt-3'], '<i class="fas fa-globe"></i> ' . \RCView::tt('multilang_223')) : "";
         $this->initializeJavascriptModuleObject();
         ?>
         <!-- Force Draft Review: start -->
         <style type="text/css">
-            #fdr-submit-btn-container { display: none; margin-top: 2em; margin-left: 1em; }
+            #fdr-submit-btn-container { display: none; margin-top: 2em; }
             #fdr-confirm-review { display: none; }
         </style>
         <span id="fdr-submit-btn-container"><button type="button" id="fdr-submit-btn" class=jqbutton fs14><i class="fa-solid fa-circle-check"></i> <?= \RCView::tt('design_255',false) ?></button></span>
@@ -113,9 +117,11 @@ class ForceDraftReview extends AbstractExternalModule
 
                 module.init = function() {
                     if (module.return_prev_page_btn.length) {
-                        $('#fdr-submit-btn-container').insertAfter(module.return_prev_page_btn).show();
-                        $(module.submit_changes_btn).on('click', module.submit_changes);
+                        $('#fdr-submit-btn-container').css('margin-left', '1em').insertAfter(module.return_prev_page_btn).show();
+                    } else {
+                        $('#fdr-submit-btn-container').insertAfter('#diff-display').show();
                     }
+                    $(module.submit_changes_btn).on('click', module.submit_changes);
                 };
 
                 $(document).ready(function(){ module.init(); });
