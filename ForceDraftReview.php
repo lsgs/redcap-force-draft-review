@@ -81,6 +81,16 @@ class ForceDraftReview extends AbstractExternalModule
         $auto_prod_txt = ($auto_prod_changes > 0) ? "<div style='background:#f5f5f5;border:1px solid #ddd;padding:4px;'>".\RCView::tt('design_287',false)."</div>" : "<br>";
         $multi_lang_txt = (\MultiLanguageManagement\MultiLanguage::isActive($project_id) && \MultiLanguageManagement\MultiLanguage::hasLanguages($project_id)) ? \RCView::div(['class'=>'yellow mt-3'], '<i class="fas fa-globe"></i> ' . \RCView::tt('multilang_223')) : "";
         $this->initializeJavascriptModuleObject();
+
+        if (
+                (version_compare(REDCAP_VERSION, '17.5.7')>=0) || // STD
+                (version_compare(REDCAP_VERSION, '17.3.21')>=0 && version_compare(REDCAP_VERSION, '17.4.0')<0) // LTS
+            ) {
+            // submit via POST not GET after REDCap 17.5.7 (STD) and 17.3.21 (LTS)
+            $draftModeCsrfToken = \RCView::escape(\System::getCsrfToken());
+            print "<form id='draft-mode-review-form' method='post' action='".APP_PATH_WEBROOT."Design/draft_mode_review.php?pid=$project_id'>"
+            ."<input type='hidden' name='redcap_csrf_token' value='$draftModeCsrfToken'></form>";
+        }
         ?>
         <!-- Force Draft Review: start -->
         <style type="text/css">
@@ -110,7 +120,16 @@ class ForceDraftReview extends AbstractExternalModule
                             $('#fdr-confirm-review').parent().find('.ui-dialog-buttonpane button:eq(1)').html('<?= js_escape(\RCView::tt('design_160',false)) ?>');
                             $('#fdr-confirm-review').parent().find('.ui-dialog-buttonpane button:eq(0)').css('display','none');
                             showProgress(1);
-                            window.location.href=app_path_webroot+'Design/draft_mode_review.php?pid='+pid;
+                            <?php
+                            if (
+                                    (version_compare(REDCAP_VERSION, '17.5.7')>=0) || // STD
+                                    (version_compare(REDCAP_VERSION, '17.3.21')>=0 && version_compare(REDCAP_VERSION, '17.4.0')<0) // LTS
+                                ) {
+                                echo "document.getElementById('draft-mode-review-form').submit();";
+                            } else {
+                                echo "window.location.href=app_path_webroot+'Design/draft_mode_review.php?pid='+pid;";
+                            }
+                            ?>
                         }
                     } });
                 };
